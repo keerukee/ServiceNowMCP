@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>ServiceNowEnterpriseMcp</AssemblyName>
+    <RootNamespace>ServiceNowMcp</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="McpHttpServer" Version="1.0.0" />
+  </ItemGroup>
+
+</Project>
