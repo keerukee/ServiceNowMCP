@@ -10,6 +10,7 @@ Built with [McpHttpServer](https://www.nuget.org/packages/McpHttpServer/) — a 
 - ✅ **OAuth 2.0 Client Credentials** — Secure server-to-server authentication with auto-refresh
 - ✅ **SOLID Architecture** — Interface Segregation, Single Responsibility, Dependency Injection
 - ✅ **Reference Field Resolution** — Accepts display names (e.g., CI name) and resolves to sys_id
+- ✅ **Content & Resolution Search** — Search similar incidents across symptoms, error messages, and past resolutions
 - ✅ **20+ MCP Tools** — Full CRUD for Incidents, Change Requests, Problems, CMDB, Users, Service Catalog
 - ✅ **MCP Resources** — URI-based read-only access to reports and schema
 - ✅ **MCP Prompts** — Guided workflows for incident triage and change management
@@ -19,7 +20,7 @@ Built with [McpHttpServer](https://www.nuget.org/packages/McpHttpServer/) — a 
 
 | Category | Tools |
 |----------|-------|
-| **Incidents** | `get_incident`, `query_incidents`, `create_incident`, `update_incident`, `add_incident_comment` |
+| **Incidents** | `get_incident`, `query_incidents`, `search_similar_incidents`, `create_incident`, `update_incident`, `add_incident_comment` |
 | **Change Requests** | `get_change_request`, `query_change_requests`, `create_change_request`, `update_change_request` |
 | **CMDB CI** | `get_cmdb_ci`, `query_cmdb_cis` |
 | **Users** | `get_user`, `query_users` |
@@ -40,6 +41,7 @@ Built with [McpHttpServer](https://www.nuget.org/packages/McpHttpServer/) — a 
 |------|-------------|
 | `servicenow-triage_incident` | Guided incident triage workflow |
 | `servicenow-create_change` | Guided change request creation |
+| `servicenow-analyze_incident_resolution` | Historical similar incident and resolution analysis |
 
 ## Prerequisites
 

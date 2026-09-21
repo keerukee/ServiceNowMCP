@@ -66,4 +66,32 @@ public class ServiceNowPrompts
             Ensure all plans are detailed and actionable.
             """;
     }
+
+    [McpPrompt(
+        "servicenow-analyze_incident_resolution",
+        "Analyze a current incident against historical incidents to find identical issues and their resolutions")]
+    public static string AnalyzeIncidentResolution(
+        [McpArgument("The current incident number (e.g. INC0010001) or description of the current issue")]
+        string issue_or_incident_number)
+    {
+        return $"""
+            You are an expert ServiceNow Incident and Problem Resolution Analyst.
+            Your task is to analyze the issue described below, locate historical incidents with matching symptoms, and extract proven resolutions.
+
+            Target Issue: {issue_or_incident_number}
+
+            Investigation Workflow:
+            1. If an incident number (e.g. INCxxxxxxx) was provided, call `get_incident` to retrieve its full details (short_description, description, category, cmdb_ci).
+            2. Extract the core symptoms, error messages, and affected component.
+            3. Call `search_similar_incidents` using the extracted symptoms/error text with `only_resolved = true`.
+            4. Review the returned historical incidents:
+               - Compare the symptoms and root causes.
+               - Inspect `close_code` and `close_notes` for workarounds and permanent fixes.
+            5. Provide a structured incident resolution report:
+               - **Symptom Match Analysis**: How closely past incidents match the current issue.
+               - **Identified Root Cause**: Most likely cause based on past patterns.
+               - **Recommended Resolution / Workaround**: Step-by-step resolution extracted from past `close_notes`.
+               - **Reference Incidents**: List of matching incident numbers and their close codes.
+            """;
+    }
 }

@@ -74,6 +74,50 @@ public sealed class IncidentService : IIncidentReader, IIncidentWriter
         return await _client.PatchAsync($"{ApiBase}/{sysId}", data);
     }
 
+    public async Task<string> SearchSimilarAsync(
+        string queryText,
+        bool onlyResolved = true,
+        string? category = null,
+        string? cmdbCi = null,
+        int limit = 5)
+    {
+        const string fields = "number,short_description,description,state,close_code,close_notes,category,cmdb_ci,resolved_at,closed_at,sys_created_on";
+        var baseFilter = BuildSimilarBaseFilter(onlyResolved, category, cmdbCi);
+        var sanitized = queryText.Replace("^", " ").Trim();
+
+        // Try Zing full-text search first (indexed across all text fields)
+        var fullTextQuery = $"123TEXTQUERY321={sanitized}{baseFilter}^ORDERBYDESCsys_created_on";
+        var result = await QueryAsync(fullTextQuery, limit, 0, fields);
+
+        if (HasResults(result))
+            return result;
+
+        // Fallback: substring matching across short_description, description, close_notes
+        var likeQuery = $"(short_descriptionLIKE{sanitized}^ORdescriptionLIKE{sanitized}^ORclose_notesLIKE{sanitized}){baseFilter}^ORDERBYDESCsys_created_on";
+        return await QueryAsync(likeQuery, limit, 0, fields);
+    }
+
+    private static string BuildSimilarBaseFilter(bool onlyResolved, string? category, string? cmdbCi)
+    {
+        var filter = string.Empty;
+        if (onlyResolved) filter += "^stateIN6,7";
+        if (!string.IsNullOrWhiteSpace(category)) filter += $"^category={category}";
+        if (!string.IsNullOrWhiteSpace(cmdbCi)) filter += $"^cmdb_ci={cmdbCi}";
+        return filter;
+    }
+
+    private static bool HasResults(string json)
+    {
+        try
+        {
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            if (doc.RootElement.TryGetProperty("result", out var res) && res.ValueKind == System.Text.Json.JsonValueKind.Array)
+                return res.GetArrayLength() > 0;
+        }
+        catch { }
+        return false;
+    }
+
     private static Dictionary<string, string> BuildDisplayParams()
     {
         return new Dictionary<string, string>

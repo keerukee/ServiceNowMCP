@@ -17,4 +17,14 @@ public interface IIncidentReader
 
     /// <summary>Retrieves an incident by its INCxxxxxx number.</summary>
     Task<string> GetByNumberAsync(string number);
+
+    /// <summary>
+    /// Searches incidents by content, keywords, or error messages to find similar issues and past resolutions.
+    /// </summary>
+    Task<string> SearchSimilarAsync(
+        string queryText,
+        bool onlyResolved = true,
+        string? category = null,
+        string? cmdbCi = null,
+        int limit = 5);
 }

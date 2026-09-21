@@ -50,6 +50,45 @@ public class IncidentTools
         }
     }
 
+    [McpTool("search_similar_incidents", "Search resolved incidents by keywords or error text to find past resolutions")]
+    public static string SearchSimilarIncidents(
+        [McpParameter("Error message, symptoms, or issue description to search for")]
+        string query,
+        [McpParameter("If true, only return resolved/closed incidents with resolutions (default: true)")]
+        bool only_resolved = true,
+        [McpParameter("Filter by category (e.g. network, software, hardware)")]
+        string category = "",
+        [McpParameter("Filter by CI name or sys_id")]
+        string cmdb_ci = "",
+        [McpParameter("Maximum number of similar incidents to return (default: 5)")]
+        int limit = 5)
+    {
+        try
+        {
+            var reader = ServiceLocator.GetRequired<IIncidentReader>();
+            var resolver = ServiceLocator.GetRequired<ReferenceFieldResolver>();
+
+            string? resolvedCi = null;
+            if (!string.IsNullOrWhiteSpace(cmdb_ci))
+            {
+                resolvedCi = resolver.ResolveAsync("cmdb_ci", "name", cmdb_ci)
+                    .GetAwaiter().GetResult();
+            }
+
+            return reader.SearchSimilarAsync(
+                query,
+                only_resolved,
+                NullIfEmpty(category),
+                resolvedCi,
+                limit
+            ).GetAwaiter().GetResult();
+        }
+        catch (Exception ex)
+        {
+            return $"Error searching similar incidents: {ex.Message}";
+        }
+    }
+
     [McpTool("create_incident", "Create a new ServiceNow incident")]
     public static string CreateIncident(
         [McpParameter("Short description of the incident")]
